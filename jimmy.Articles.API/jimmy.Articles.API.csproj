@@ -20,5 +20,12 @@
       <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.0.7" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Domain\Articles" />
+      <Folder Include="Domain\SomeAnotherModel\Commands" />
+      <Folder Include="Domain\SomeAnotherModel\Queries" />
+      <Folder Include="Infrastructure\Communication" />
+    </ItemGroup>
+
 
 </Project>

@@ -12,7 +12,7 @@ namespace jimmy.Articles.API.Controllers
         }
         
         [HttpGet]
-        public async Task<IActionResult> GetAll(int limit, bool descending)
+        public async Task<IActionResult> Get(int limit, bool descending)
         {
             return Ok();
         }

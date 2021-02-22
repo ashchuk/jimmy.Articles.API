@@ -9,6 +9,6 @@ namespace jimmy.Articles.API.Context
             : base(options)
         {
         }
-        public DbSet<Article> Products { get; set; }
+        public DbSet<Article> Articles { get; set; }
     }
 }

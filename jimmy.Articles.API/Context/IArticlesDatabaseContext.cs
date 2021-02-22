@@ -5,7 +5,6 @@ namespace jimmy.Articles.API.Context
 {
     public interface IArticlesDatabaseContext
     {
-        
-        DbSet<Article> Products { get; set; }
+        DbSet<Article> Articles { get; set; }
     }
 }
