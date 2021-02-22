@@ -1,38 +1,50 @@
+using System;
 using System.Threading.Tasks;
+using jimmy.Articles.API.Domain.Articles.Commands;
+using jimmy.Articles.API.Domain.Articles.Queries;
+using jimmy.Articles.API.Infrastructure.Communication;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace jimmy.Articles.API.Controllers
-{
+{    
+    [Route("api/[controller]")]
+    [ApiController]
     public class ArticlesController : Controller
     {
-        [HttpPost]
-        public async Task<IActionResult> Create()
+        private readonly IMediator _mediator;
+        public ArticlesController(IMediator mediator)
         {
-            return Ok();
+            _mediator = mediator;
+        }
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] ArticleResource resource)
+        {
+            return Ok(await _mediator.Send(new CreateArticleCommand(resource.Title, resource.Body)));
         }
         
         [HttpGet]
         public async Task<IActionResult> Get(int limit, bool descending)
         {
-            return Ok();
+            return Ok(await _mediator.Send(new GetArticlesQuery(limit, descending)));
         }
         
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(Guid id)
         {
-            return Ok();
+            return Ok(await _mediator.Send(new GetArticleByIdQuery(id)));
         }
         
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            return Ok();
+            return Ok(await _mediator.Send(new DeleteArticleCommand(id)));
         }
         
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id)
+        public async Task<IActionResult> Update(Guid id, [FromBody] ArticleResource resource)
         {
-            return Ok();
+            return Ok(await _mediator.Send(new UpdateArticleCommand(id, resource.Title, resource.Body)));
         }
     }
 }
