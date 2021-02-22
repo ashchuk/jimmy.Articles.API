@@ -1,7 +1,16 @@
-namespace jimmy.Articles.API.Domain.Commands
+using System;
+using jimmy.Articles.API.Models;
+using MediatR;
+
+namespace jimmy.Articles.API.Domain.Articles.Commands
 {
-    public class DeleteCommand
+    public class DeleteArticleCommand : IRequest<Article>
     {
-        
+        public Guid Id { get; private set; }
+
+        public DeleteArticleCommand(Guid id)
+        {
+            this.Id = id;
+        }
     }
 }

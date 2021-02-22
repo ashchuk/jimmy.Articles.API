@@ -1,7 +1,33 @@
-namespace jimmy.Articles.API.Domain.Commands
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using jimmy.Articles.API.Context;
+using jimmy.Articles.API.Models;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+
+namespace jimmy.Articles.API.Domain.Articles.Commands
 {
-    public class DeleteCommandHandler
+    public class DeleteArticleCommandHandler: IRequestHandler<DeleteArticleCommand, Article>
     {
-        
+        private readonly ArticlesDatabaseContext _context;
+
+        public DeleteArticleCommandHandler(ArticlesDatabaseContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<Article> Handle(DeleteArticleCommand request, CancellationToken cancellationToken)
+        {
+            var article = await _context.Articles
+                .Where(item => item.Id == request.Id)
+                .FirstOrDefaultAsync(cancellationToken: cancellationToken);
+            
+            if (article == null) return default;
+            
+            _context.Articles.Remove(article);
+            await _context.SaveChangesAsync(cancellationToken);
+            return article;
+        }
     }
 }
