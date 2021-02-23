@@ -1,11 +1,8 @@
 using System;
-using System.Collections;
 using System.Linq;
 using System.Threading.Tasks;
-using jimmy.Articles.API.Domain.Articles.Commands;
 using jimmy.Articles.API.Domain.Articles.Queries;
 using jimmy.Articles.API.Models;
-using Microsoft.EntityFrameworkCore;
 using Shouldly;
 using Xunit;
 
@@ -60,6 +57,54 @@ namespace jimmy.Articles.API.Tests.Articles
 
             var result = await _fixture.SendAsync(new GetArticlesQuery(limit, descending));
             result.Count.ShouldBe(limit);
+        }
+        
+        [Fact]
+        public async Task Should_be_sorted_by_ascending()
+        {
+            const int limit = 10;
+            const bool descending = false;
+            foreach (var index in Enumerable.Range(1, 20))
+            {
+                await _fixture.InsertAsync(new Article
+                {
+                    Id = Guid.NewGuid(),
+                    Title = $"New Article title {index}",
+                    Body = $"New Article body {index}",
+                    CreationDate = DateTime.Now,
+                    UpdatingDate = DateTime.Now
+                });
+            }
+
+            var result = await _fixture.SendAsync(new GetArticlesQuery(limit, descending));
+
+            var firstDate = result.First().CreationDate;
+            var lastDate = result.Last().CreationDate;
+            firstDate.ShouldBeLessThan(lastDate);
+        }     
+        
+        [Fact]
+        public async Task Should_be_sorted_by_descending()
+        {
+            const int limit = 10;
+            const bool descending = true;
+            foreach (var index in Enumerable.Range(1, 20))
+            {
+                await _fixture.InsertAsync(new Article
+                {
+                    Id = Guid.NewGuid(),
+                    Title = $"New Article title {index}",
+                    Body = $"New Article body {index}",
+                    CreationDate = DateTime.Now,
+                    UpdatingDate = DateTime.Now
+                });
+            }
+
+            var result = await _fixture.SendAsync(new GetArticlesQuery(limit, descending));
+
+            var firstDate = result.First().CreationDate;
+            var lastDate = result.Last().CreationDate;
+            firstDate.ShouldBeGreaterThan(lastDate);
         }
     }
 }
