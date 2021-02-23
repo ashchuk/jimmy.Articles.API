@@ -31,7 +31,7 @@ namespace jimmy.Articles.API
         {
             services.AddDbContext<ArticlesDatabaseContext>(options =>
             {
-                options.UseInMemoryDatabase("ARTICLES");
+                options.UseInMemoryDatabase("Articles");
             });
             
             services.AddMediatR(typeof(Startup));
