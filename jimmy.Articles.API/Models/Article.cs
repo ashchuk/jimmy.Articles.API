@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace jimmy.Articles.API.Models
 {
-    public class Article
+    public class Article: IEntity
     {
         [Key]
         public Guid Id { get; set; }

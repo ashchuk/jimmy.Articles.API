@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using jimmy.Articles.API.Context;
 using jimmy.Articles.API.Models;
@@ -205,6 +204,12 @@ namespace jimmy.Articles.API.Tests
             });
         }
 
+        public Task<T> FindAsync<T>(Guid id)
+            where T : class, IEntity
+        {
+            return ExecuteDbContextAsync(db => db.Set<T>().FindAsync(id).AsTask());
+        }
+        
         public Task<T> FindAsync<T>(int id)
             where T : class, IEntity
         {
@@ -230,10 +235,6 @@ namespace jimmy.Articles.API.Tests
                 return mediator.Send(request);
             });
         }
-
-        private int _courseNumber = 1;
-
-        public int NextCourseNumber() => Interlocked.Increment(ref _courseNumber);
 
         public Task InitializeAsync()
         {
