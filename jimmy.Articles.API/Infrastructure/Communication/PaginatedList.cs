@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace jimmy.Articles.API.Infrastructure.Communication
 {
+    // TODO: use PaginatedList in get Articles list query
     public class PaginatedList<T> : List<T>
     {
         public int PageIndex { get; }

@@ -11,25 +11,34 @@ services:
       - ACCEPT_EULA=Y
     ports:
       - "5433:1433"
+    networks:
+      - test-network
 
   articles-api-test:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - ConnectionString=${ARTICLE_DB:-Server=sqldata;Database=ArticleDb;User Id=sa;Password=Pass@word}
+      - ConnectionString=Server=sqldata-test,1433;Database=articlesdb;User Id=SA;Password=Pass@word;
+      - Database__DatabaseType=SQLServer
       - UserServiceUsername=${USER_SERVICE_USERNAME}
       - UserServicePassword=${USER_SERVICE_PASSWORD}
       - UseXmlFormatter=${USE_XML_FORMATTER}
       - ApplicationInsights__InstrumentationKey=${INSTRUMENTATION_KEY}
     ports:
       - "5102:80"
+    networks:
+      - test-network
     entrypoint:
       - dotnet
       - test
       - --logger
       - trx;LogFileName=/tests/articles-test-results.xml
-        
 
 volumes:
   articles-test-data:
     external: false
+
+networks:
+  test-network:
+    name: test-network
+  

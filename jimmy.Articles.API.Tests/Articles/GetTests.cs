@@ -42,6 +42,7 @@ namespace jimmy.Articles.API.Tests.Articles
         public async Task Should_limit_query_for_articles()
         {
             const int limit = 10;
+            const int offset = 20;
             const bool descending = false;
             foreach (var index in Enumerable.Range(1, 20))
             {
@@ -55,7 +56,7 @@ namespace jimmy.Articles.API.Tests.Articles
                 });
             }
 
-            var result = await _fixture.SendAsync(new GetArticlesQuery(limit, descending));
+            var result = await _fixture.SendAsync(new GetArticlesQuery(limit, offset, descending));
             result.Count.ShouldBe(limit);
         }
         
@@ -63,6 +64,7 @@ namespace jimmy.Articles.API.Tests.Articles
         public async Task Should_be_sorted_by_ascending()
         {
             const int limit = 10;
+            const int offset = 20;
             const bool descending = false;
             foreach (var index in Enumerable.Range(1, 20))
             {
@@ -74,9 +76,10 @@ namespace jimmy.Articles.API.Tests.Articles
                     CreationDate = DateTime.Now,
                     UpdatingDate = DateTime.Now
                 });
+                await Task.Delay(200);
             }
 
-            var result = await _fixture.SendAsync(new GetArticlesQuery(limit, descending));
+            var result = await _fixture.SendAsync(new GetArticlesQuery(limit, offset, descending));
 
             var firstDate = result.First().CreationDate;
             var lastDate = result.Last().CreationDate;
@@ -87,6 +90,7 @@ namespace jimmy.Articles.API.Tests.Articles
         public async Task Should_be_sorted_by_descending()
         {
             const int limit = 10;
+            const int offset = 20;
             const bool descending = true;
             foreach (var index in Enumerable.Range(1, 20))
             {
@@ -98,9 +102,10 @@ namespace jimmy.Articles.API.Tests.Articles
                     CreationDate = DateTime.Now,
                     UpdatingDate = DateTime.Now
                 });
+                await Task.Delay(200);
             }
 
-            var result = await _fixture.SendAsync(new GetArticlesQuery(limit, descending));
+            var result = await _fixture.SendAsync(new GetArticlesQuery(limit, offset, descending));
 
             var firstDate = result.First().CreationDate;
             var lastDate = result.Last().CreationDate;
@@ -111,6 +116,7 @@ namespace jimmy.Articles.API.Tests.Articles
         public async Task Should_return_empty_list_if_limit_is_invalid()
         {
             const int limit = -1;
+            const int offset = 20;
             const bool descending = true;
             foreach (var index in Enumerable.Range(1, 20))
             {
@@ -124,7 +130,7 @@ namespace jimmy.Articles.API.Tests.Articles
                 });
             }
 
-            var result = await _fixture.SendAsync(new GetArticlesQuery(limit, descending));
+            var result = await _fixture.SendAsync(new GetArticlesQuery(limit, offset, descending));
             result.Count().ShouldBe(0);
         }
     }

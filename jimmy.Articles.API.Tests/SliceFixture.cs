@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using jimmy.Articles.API.Context;
 using jimmy.Articles.API.Models;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Respawn;
@@ -17,7 +19,9 @@ using Xunit;
 namespace jimmy.Articles.API.Tests
 {
     [CollectionDefinition(nameof(SliceFixture))]
-    public class SliceFixtureCollection : ICollectionFixture<SliceFixture> { }
+    public class SliceFixtureCollection : ICollectionFixture<SliceFixture>
+    {
+    }
 
     public class SliceFixture : IAsyncLifetime
     {
@@ -29,50 +33,26 @@ namespace jimmy.Articles.API.Tests
         public SliceFixture()
         {
             _factory = new ArticlesTestApplicationFactory();
-            
+
             _configuration = _factory.Services.GetRequiredService<IConfiguration>();
             _scopeFactory = _factory.Services.GetRequiredService<IServiceScopeFactory>();
             _checkpoint = new Checkpoint();
         }
 
-        public class ArticlesTestApplicationFactory 
+        public class ArticlesTestApplicationFactory
             : WebApplicationFactory<Startup>
         {
+            private string _connectionString = "Server=127.0.0.1,5433;Database=articlesdb;User Id=SA;Password=Pass@word;";
+            // private string _connectionString = "Server=sqldata-test,1433;Database=articlesdb;User Id=SA;Password=Pass@word";
+
             protected override void ConfigureWebHost(IWebHostBuilder builder)
             {
-                // TODO: add MSSQL Server support
-                // private readonly string _connectionString = "Server=(localdb)\\mssqllocaldb;Database=Articles;Trusted_Connection=True;MultipleActiveResultSets=true";
-                
-                builder.ConfigureServices(services =>
-                {
-                    // Switch to UseInMemoryDatabase for testing purposes
-                    // 
-                    // https://stackoverflow.com/questions/58375527/override-ef-core-dbcontext-in-asp-net-core-webapplicationfactory
-                    
-                    // Remove the app's ApplicationDbContext registration.
-                    var descriptor = services.SingleOrDefault(
-                        d => d.ServiceType ==
-                             typeof(DbContextOptions<ArticlesDatabaseInMemoryDbContext>));
-
-                    if (descriptor != null)
-                    {
-                        services.Remove(descriptor);
-                    }
-                    // Add ApplicationDbContext using an in-memory database for testing.
-                    services.AddDbContext<ArticlesDatabaseInMemoryDbContext>(options =>
-                    {
-                        options.UseInMemoryDatabase("Articles")
-                            .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning));
-                    });
-                });
                 builder.ConfigureAppConfiguration((_, configBuilder) =>
                 {
                     configBuilder.AddInMemoryCollection(new Dictionary<string, string>
                     {
-                        // TODO: add MSSQL Server support
-                        // {"ConnectionStrings:DefaultConnection", _connectionString}
+                        {"ConnectionStrings:DefaultConnection", _connectionString}
                     });
-                    
                 });
             }
         }
@@ -92,7 +72,7 @@ namespace jimmy.Articles.API.Tests
             }
             catch (Exception)
             {
-                dbContext.RollbackTransaction(); 
+                dbContext.RollbackTransaction();
                 throw;
             }
         }
@@ -119,22 +99,22 @@ namespace jimmy.Articles.API.Tests
             }
         }
 
-        public Task ExecuteDbContextAsync(Func<IArticlesDatabaseContext, Task> action) 
+        public Task ExecuteDbContextAsync(Func<IArticlesDatabaseContext, Task> action)
             => ExecuteScopeAsync(sp => action(sp.GetService<IArticlesDatabaseContext>()));
 
-        public Task ExecuteDbContextAsync(Func<IArticlesDatabaseContext, ValueTask> action) 
+        public Task ExecuteDbContextAsync(Func<IArticlesDatabaseContext, ValueTask> action)
             => ExecuteScopeAsync(sp => action(sp.GetService<IArticlesDatabaseContext>()).AsTask());
 
-        public Task ExecuteDbContextAsync(Func<IArticlesDatabaseContext, IMediator, Task> action) 
+        public Task ExecuteDbContextAsync(Func<IArticlesDatabaseContext, IMediator, Task> action)
             => ExecuteScopeAsync(sp => action(sp.GetService<IArticlesDatabaseContext>(), sp.GetService<IMediator>()));
 
-        public Task<T> ExecuteDbContextAsync<T>(Func<IArticlesDatabaseContext, Task<T>> action) 
+        public Task<T> ExecuteDbContextAsync<T>(Func<IArticlesDatabaseContext, Task<T>> action)
             => ExecuteScopeAsync(sp => action(sp.GetService<IArticlesDatabaseContext>()));
 
-        public Task<T> ExecuteDbContextAsync<T>(Func<IArticlesDatabaseContext, ValueTask<T>> action) 
+        public Task<T> ExecuteDbContextAsync<T>(Func<IArticlesDatabaseContext, ValueTask<T>> action)
             => ExecuteScopeAsync(sp => action(sp.GetService<IArticlesDatabaseContext>()).AsTask());
 
-        public Task<T> ExecuteDbContextAsync<T>(Func<IArticlesDatabaseContext, IMediator, Task<T>> action) 
+        public Task<T> ExecuteDbContextAsync<T>(Func<IArticlesDatabaseContext, IMediator, Task<T>> action)
             => ExecuteScopeAsync(sp => action(sp.GetService<IArticlesDatabaseContext>(), sp.GetService<IMediator>()));
 
         public Task InsertAsync<T>(params T[] entities) where T : class
@@ -145,6 +125,7 @@ namespace jimmy.Articles.API.Tests
                 {
                     db.Set<T>().Add(entity);
                 }
+
                 return db.SaveChangesAsync();
             });
         }
@@ -159,7 +140,7 @@ namespace jimmy.Articles.API.Tests
             });
         }
 
-        public Task InsertAsync<TEntity, TEntity2>(TEntity entity, TEntity2 entity2) 
+        public Task InsertAsync<TEntity, TEntity2>(TEntity entity, TEntity2 entity2)
             where TEntity : class
             where TEntity2 : class
         {
@@ -172,7 +153,7 @@ namespace jimmy.Articles.API.Tests
             });
         }
 
-        public Task InsertAsync<TEntity, TEntity2, TEntity3>(TEntity entity, TEntity2 entity2, TEntity3 entity3) 
+        public Task InsertAsync<TEntity, TEntity2, TEntity3>(TEntity entity, TEntity2 entity2, TEntity3 entity3)
             where TEntity : class
             where TEntity2 : class
             where TEntity3 : class
@@ -187,7 +168,8 @@ namespace jimmy.Articles.API.Tests
             });
         }
 
-        public Task InsertAsync<TEntity, TEntity2, TEntity3, TEntity4>(TEntity entity, TEntity2 entity2, TEntity3 entity3, TEntity4 entity4) 
+        public Task InsertAsync<TEntity, TEntity2, TEntity3, TEntity4>(TEntity entity, TEntity2 entity2,
+            TEntity3 entity3, TEntity4 entity4)
             where TEntity : class
             where TEntity2 : class
             where TEntity3 : class
@@ -209,7 +191,7 @@ namespace jimmy.Articles.API.Tests
         {
             return ExecuteDbContextAsync(db => db.Set<T>().FindAsync(id).AsTask());
         }
-        
+
         public Task<T> FindAsync<T>(int id)
             where T : class, IEntity
         {
@@ -238,11 +220,11 @@ namespace jimmy.Articles.API.Tests
 
         public Task InitializeAsync()
         {
-            // Check for active MSSQL connection
-            if (string.IsNullOrEmpty(this._configuration.GetConnectionString("DefaultConnection")))
+            if (string.IsNullOrEmpty(_configuration.GetConnectionString("DefaultConnection")))
             {
                 return Task.CompletedTask;
             }
+
             return _checkpoint.Reset(_configuration.GetConnectionString("DefaultConnection"));
         }
 

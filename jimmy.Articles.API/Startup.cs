@@ -1,8 +1,10 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using FluentValidation;
 using jimmy.Articles.API.Context;
 using jimmy.Articles.API.Infrastructure.Auth;
+using jimmy.Articles.API.PipelineBehaviors;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -33,6 +35,7 @@ namespace jimmy.Articles.API
 
         public void ConfigureServices(IServiceCollection services)
         {
+            #region Database
             var databaseSection = Configuration.GetSection("Database");
             var databaseSettings = databaseSection?.Get<DatabaseSettings>();
             services.Configure<DatabaseSettings>(databaseSection);
@@ -46,8 +49,6 @@ namespace jimmy.Articles.API
                             sqlServerOptionsAction: sqlOptions =>
                             {
                                 sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
-                                //Configuring Connection Resiliency: https://docs.microsoft.com/en-us/ef/core/miscellaneous/connection-resiliency 
-                                sqlOptions.EnableRetryOnFailure(maxRetryCount: 15, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
                             });
 
                         // Changing default behavior when client evaluation occurs to throw. 
@@ -64,13 +65,19 @@ namespace jimmy.Articles.API
                     options.UseInMemoryDatabase("Articles");
                 });
             }
+            #endregion
+            services.AddMediatR(typeof(Startup).Assembly);
             
-            services.AddMediatR(typeof(Startup));
+            // Logging and Validation app behavior
+            services.AddValidatorsFromAssembly(typeof(Startup).Assembly);
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
             
             services.AddAuthentication("BasicAuthentication")
                 .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
             services.AddScoped<IUserService, UserService>();
             
+            #region Swagger
             services.AddSwaggerGen();
             services.AddSwaggerGen(options =>
             {
@@ -117,6 +124,7 @@ namespace jimmy.Articles.API
                     }
                 });
             });
+            #endregion
             services.AddControllers();
         }
 
@@ -127,6 +135,7 @@ namespace jimmy.Articles.API
                 app.UseDeveloperExceptionPage();
             }
 
+            #region Database
             var databaseSection = Configuration.GetSection("Database");
             var databaseSettings = databaseSection?.Get<DatabaseSettings>();
             if (databaseSettings?.DatabaseType == "SQLServer")
@@ -137,12 +146,15 @@ namespace jimmy.Articles.API
                     context.Database.EnsureCreated();
                 }
             }
+            #endregion
+            #region Swagger
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Articles API V1");
             });
+            #endregion
             app.UseHttpsRedirection();
 
             app.UseRouting();

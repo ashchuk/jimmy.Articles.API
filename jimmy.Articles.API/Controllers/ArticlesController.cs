@@ -28,9 +28,9 @@ namespace jimmy.Articles.API.Controllers
         
         [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> Get(int limit, bool descending)
+        public async Task<IActionResult> Get([FromQuery] ListArticlesResource resource)
         {
-            return Ok(await _mediator.Send(new GetArticlesQuery(limit, descending)));
+            return Ok(await _mediator.Send(new GetArticlesQuery(resource.Limit, resource.Offset, resource.OrderByDescending)));
         }
         
         [AllowAnonymous]
