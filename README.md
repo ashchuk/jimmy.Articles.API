@@ -43,3 +43,8 @@ Technical Requirements:
 - add docker/docker-compose support
 - add MSSQL container into docker-compose file
 - write pretty README file
+
+To run tests
+```docker-compose -f .\docker-compose.tests.yml -f .\docker-compose.tests.override.yml up sqldata-test articles-api-test```
+To run app
+```docker-compose -f .\docker-compose.yml -f .\docker-compose.override.yml up sqldata articles-api```

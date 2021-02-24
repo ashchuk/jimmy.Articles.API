@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+
+  sqldata:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+
+  articles-api:
+    image: ${REGISTRY:-jimmy}/articles.api:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: jimmy.Articles.API/Dockerfile
+    depends_on:
+      - sqldata
