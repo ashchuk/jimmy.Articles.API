@@ -14,4 +14,4 @@ services:
     depends_on:
       - sqldata-test
     volumes:
-      - articles-test-data:-./tests-results/:/tests
+      - articles-test-data:/tests-results/

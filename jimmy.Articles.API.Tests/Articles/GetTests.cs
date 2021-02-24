@@ -105,6 +105,27 @@ namespace jimmy.Articles.API.Tests.Articles
             var firstDate = result.First().CreationDate;
             var lastDate = result.Last().CreationDate;
             firstDate.ShouldBeGreaterThan(lastDate);
+        }     
+        
+        [Fact]
+        public async Task Should_return_empty_list_if_limit_is_invalid()
+        {
+            const int limit = -1;
+            const bool descending = true;
+            foreach (var index in Enumerable.Range(1, 20))
+            {
+                await _fixture.InsertAsync(new Article
+                {
+                    Id = Guid.NewGuid(),
+                    Title = $"New Article title {index}",
+                    Body = $"New Article body {index}",
+                    CreationDate = DateTime.Now,
+                    UpdatingDate = DateTime.Now
+                });
+            }
+
+            var result = await _fixture.SendAsync(new GetArticlesQuery(limit, descending));
+            result.Count().ShouldBe(0);
         }
     }
 }

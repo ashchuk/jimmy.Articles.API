@@ -3,7 +3,7 @@ WORKDIR /app
 EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
-WORKDIR /src
+WORKDIR /
 
 # It's important to keep lines from here down to "COPY . ." identical in all Dockerfiles
 # to take advantage of Docker's build cache, to speed up local container builds
@@ -14,11 +14,7 @@ COPY "jimmy.Articles.API.Tests/jimmy.Articles.API.Tests.csproj" "jimmy.Articles.
 COPY "docker-compose.dcproj" "docker-compose.dcproj"
 COPY "NuGet.config" "NuGet.config"
 
-# check network connection 
-RUN ping -c 4 google.com
-
-# https://stackoverflow.com/questions/59752005/docker-nuget-connection-timeout
-RUN dotnet restore --disable-parallel "jimmy.Articles.API.sln"
+RUN dotnet restore "jimmy.Articles.API.sln"
 
 COPY . .
 WORKDIR /jimmy.Articles.API
