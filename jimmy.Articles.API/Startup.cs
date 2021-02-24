@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reflection;
 using jimmy.Articles.API.Context;
 using jimmy.Articles.API.Infrastructure.Auth;
@@ -29,17 +30,12 @@ namespace jimmy.Articles.API
 
         public IConfiguration Configuration { get; }
 
-        private void ConfigureInMemoryDatabase(DbContextOptionsBuilder options)
-        {
-            options.UseInMemoryDatabase("Articles");
-        }
-        
-        // This method gets called by the runtime. Use this method to add services to the container.
+
         public void ConfigureServices(IServiceCollection services)
         {
             var databaseSection = Configuration.GetSection("Database");
-            services.Configure<DatabaseSettings>(Configuration.GetSection("Database"));
-            var databaseSettings = databaseSection.Get<DatabaseSettings>();
+            var databaseSettings = databaseSection?.Get<DatabaseSettings>();
+            services.Configure<DatabaseSettings>(databaseSection);
 
             if (databaseSettings?.DatabaseType == "SQLServer")
             {
@@ -63,7 +59,10 @@ namespace jimmy.Articles.API
             }
             else
             {
-                services.AddDbContext<IArticlesDatabaseContext, ArticlesDatabaseInMemoryDbContext>(ConfigureInMemoryDatabase);
+                services.AddDbContext<IArticlesDatabaseContext, ArticlesDatabaseInMemoryDbContext>(options =>
+                {
+                    options.UseInMemoryDatabase("Articles");
+                });
             }
             
             services.AddMediatR(typeof(Startup));
@@ -121,18 +120,25 @@ namespace jimmy.Articles.API
             services.AddControllers();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IArticlesDatabaseContext articlesContext)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-            // Enable middleware to serve generated Swagger as a JSON endpoint.
-            app.UseSwagger();
 
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
-            // specifying the Swagger JSON endpoint.
+            var databaseSection = Configuration.GetSection("Database");
+            var databaseSettings = databaseSection?.Get<DatabaseSettings>();
+            if (databaseSettings?.DatabaseType == "SQLServer")
+            {
+                var context = (DbContext) articlesContext;
+                if (context != null && context.Database.GetPendingMigrations().Any())
+                {
+                    context.Database.EnsureCreated();
+                }
+            }
+
+            app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Articles API V1");
