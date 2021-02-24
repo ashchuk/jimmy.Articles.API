@@ -10,9 +10,9 @@ namespace jimmy.Articles.API.Domain.Articles.Commands
 {
     public class DeleteArticleCommandHandler: IRequestHandler<DeleteArticleCommand, Article>
     {
-        private readonly ArticlesDatabaseContext _context;
+        private readonly IArticlesDatabaseContext _context;
 
-        public DeleteArticleCommandHandler(ArticlesDatabaseContext context)
+        public DeleteArticleCommandHandler(IArticlesDatabaseContext context)
         {
             _context = context;
         }

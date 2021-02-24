@@ -25,6 +25,7 @@
       <Folder Include="Domain\Articles" />
       <Folder Include="Domain\SomeAnotherModel\Commands" />
       <Folder Include="Domain\SomeAnotherModel\Queries" />
+      <Folder Include="Migrations\SqlServerMigrations" />
     </ItemGroup>
 
 

@@ -9,9 +9,9 @@ namespace jimmy.Articles.API.Domain.Articles.Commands
 {
     public class CreateArticleCommandHandler: IRequestHandler<CreateArticleCommand, Article>
     {
-        private readonly ArticlesDatabaseContext _context;
+        private readonly IArticlesDatabaseContext _context;
 
-        public CreateArticleCommandHandler(ArticlesDatabaseContext context)
+        public CreateArticleCommandHandler(IArticlesDatabaseContext context)
         {
             _context = context;
         }

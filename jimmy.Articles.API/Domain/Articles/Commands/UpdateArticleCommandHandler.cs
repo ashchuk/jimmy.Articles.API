@@ -11,9 +11,9 @@ namespace jimmy.Articles.API.Domain.Articles.Commands
 {
     public class UpdateArticleCommandHandler: IRequestHandler<UpdateArticleCommand, Article>
     {
-        private readonly ArticlesDatabaseContext _context;
+        private readonly IArticlesDatabaseContext _context;
 
-        public UpdateArticleCommandHandler(ArticlesDatabaseContext context)
+        public UpdateArticleCommandHandler(IArticlesDatabaseContext context)
         {
             _context = context;
         }

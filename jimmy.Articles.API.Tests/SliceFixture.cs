@@ -52,14 +52,14 @@ namespace jimmy.Articles.API.Tests
                     // Remove the app's ApplicationDbContext registration.
                     var descriptor = services.SingleOrDefault(
                         d => d.ServiceType ==
-                             typeof(DbContextOptions<ArticlesDatabaseContext>));
+                             typeof(DbContextOptions<ArticlesDatabaseInMemoryDbContext>));
 
                     if (descriptor != null)
                     {
                         services.Remove(descriptor);
                     }
                     // Add ApplicationDbContext using an in-memory database for testing.
-                    services.AddDbContext<ArticlesDatabaseContext>(options =>
+                    services.AddDbContext<ArticlesDatabaseInMemoryDbContext>(options =>
                     {
                         options.UseInMemoryDatabase("Articles")
                             .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning));
@@ -80,7 +80,7 @@ namespace jimmy.Articles.API.Tests
         public async Task ExecuteScopeAsync(Func<IServiceProvider, Task> action)
         {
             using var scope = _scopeFactory.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<ArticlesDatabaseContext>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<IArticlesDatabaseContext>();
 
             try
             {
@@ -100,7 +100,7 @@ namespace jimmy.Articles.API.Tests
         public async Task<T> ExecuteScopeAsync<T>(Func<IServiceProvider, Task<T>> action)
         {
             using var scope = _scopeFactory.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<ArticlesDatabaseContext>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<IArticlesDatabaseContext>();
 
             try
             {
@@ -119,23 +119,23 @@ namespace jimmy.Articles.API.Tests
             }
         }
 
-        public Task ExecuteDbContextAsync(Func<ArticlesDatabaseContext, Task> action) 
-            => ExecuteScopeAsync(sp => action(sp.GetService<ArticlesDatabaseContext>()));
+        public Task ExecuteDbContextAsync(Func<IArticlesDatabaseContext, Task> action) 
+            => ExecuteScopeAsync(sp => action(sp.GetService<IArticlesDatabaseContext>()));
 
-        public Task ExecuteDbContextAsync(Func<ArticlesDatabaseContext, ValueTask> action) 
-            => ExecuteScopeAsync(sp => action(sp.GetService<ArticlesDatabaseContext>()).AsTask());
+        public Task ExecuteDbContextAsync(Func<IArticlesDatabaseContext, ValueTask> action) 
+            => ExecuteScopeAsync(sp => action(sp.GetService<IArticlesDatabaseContext>()).AsTask());
 
-        public Task ExecuteDbContextAsync(Func<ArticlesDatabaseContext, IMediator, Task> action) 
-            => ExecuteScopeAsync(sp => action(sp.GetService<ArticlesDatabaseContext>(), sp.GetService<IMediator>()));
+        public Task ExecuteDbContextAsync(Func<IArticlesDatabaseContext, IMediator, Task> action) 
+            => ExecuteScopeAsync(sp => action(sp.GetService<IArticlesDatabaseContext>(), sp.GetService<IMediator>()));
 
-        public Task<T> ExecuteDbContextAsync<T>(Func<ArticlesDatabaseContext, Task<T>> action) 
-            => ExecuteScopeAsync(sp => action(sp.GetService<ArticlesDatabaseContext>()));
+        public Task<T> ExecuteDbContextAsync<T>(Func<IArticlesDatabaseContext, Task<T>> action) 
+            => ExecuteScopeAsync(sp => action(sp.GetService<IArticlesDatabaseContext>()));
 
-        public Task<T> ExecuteDbContextAsync<T>(Func<ArticlesDatabaseContext, ValueTask<T>> action) 
-            => ExecuteScopeAsync(sp => action(sp.GetService<ArticlesDatabaseContext>()).AsTask());
+        public Task<T> ExecuteDbContextAsync<T>(Func<IArticlesDatabaseContext, ValueTask<T>> action) 
+            => ExecuteScopeAsync(sp => action(sp.GetService<IArticlesDatabaseContext>()).AsTask());
 
-        public Task<T> ExecuteDbContextAsync<T>(Func<ArticlesDatabaseContext, IMediator, Task<T>> action) 
-            => ExecuteScopeAsync(sp => action(sp.GetService<ArticlesDatabaseContext>(), sp.GetService<IMediator>()));
+        public Task<T> ExecuteDbContextAsync<T>(Func<IArticlesDatabaseContext, IMediator, Task<T>> action) 
+            => ExecuteScopeAsync(sp => action(sp.GetService<IArticlesDatabaseContext>(), sp.GetService<IMediator>()));
 
         public Task InsertAsync<T>(params T[] entities) where T : class
         {

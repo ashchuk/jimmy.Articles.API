@@ -11,9 +11,9 @@ namespace jimmy.Articles.API.Domain.Articles.Queries
 {
     public class GetArticlesQueryHandler: IRequestHandler<GetArticlesQuery, List<Article>>
     {
-        private readonly ArticlesDatabaseContext _context;
+        private readonly IArticlesDatabaseContext _context;
 
-        public GetArticlesQueryHandler(ArticlesDatabaseContext context)
+        public GetArticlesQueryHandler(IArticlesDatabaseContext context)
         {
             _context = context;
         }

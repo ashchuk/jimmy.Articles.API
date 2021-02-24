@@ -1,5 +1,7 @@
 using System;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using System.Threading.Tasks;
 using jimmy.Articles.API.Models;
 using Microsoft.EntityFrameworkCore;
@@ -7,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace jimmy.Articles.API.Context
 {
-    public class ArticlesDatabaseContext: DbContext, IArticlesDatabaseContext
+    public class ArticlesDatabaseInMemoryDbContext: DbContext, IArticlesDatabaseContext
     {
         private IDbContextTransaction _currentTransaction;
 
-        public ArticlesDatabaseContext(DbContextOptions<ArticlesDatabaseContext> options)
+        public ArticlesDatabaseInMemoryDbContext(DbContextOptions<ArticlesDatabaseInMemoryDbContext> options)
             : base(options)
         {
         }
@@ -20,7 +22,19 @@ namespace jimmy.Articles.API.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
         }
+
+        public new Task SaveChangesAsync(CancellationToken cancellationToken) =>
+            base.SaveChangesAsync(cancellationToken);
         
+        public Task SaveChangesAsync() =>
+            base.SaveChangesAsync();
+        
+        public new DbSet<T> Set<T>([NotNull] string name) where T : class =>
+            base.Set<T>(name);      
+        
+        public new DbSet<T> Set<T>() where T : class =>
+            base.Set<T>();
+
         public async Task BeginTransactionAsync()
         {
             if (_currentTransaction != null)

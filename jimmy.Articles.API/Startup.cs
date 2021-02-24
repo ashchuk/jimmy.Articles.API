@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using jimmy.Articles.API.Context;
 using jimmy.Articles.API.Infrastructure.Auth;
 using MediatR;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -13,6 +15,11 @@ using Microsoft.OpenApi.Models;
 
 namespace jimmy.Articles.API
 {
+    public class DatabaseSettings
+    {
+        public string DatabaseType { get; set; }
+    }
+    
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -22,13 +29,42 @@ namespace jimmy.Articles.API
 
         public IConfiguration Configuration { get; }
 
+        private void ConfigureInMemoryDatabase(DbContextOptionsBuilder options)
+        {
+            options.UseInMemoryDatabase("Articles");
+        }
+        
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ArticlesDatabaseContext>(options =>
+            var databaseSection = Configuration.GetSection("Database");
+            services.Configure<DatabaseSettings>(Configuration.GetSection("Database"));
+            var databaseSettings = databaseSection.Get<DatabaseSettings>();
+
+            if (databaseSettings?.DatabaseType == "SQLServer")
             {
-                options.UseInMemoryDatabase("Articles");
-            });
+                services.AddEntityFrameworkSqlServer()
+                    .AddDbContext<IArticlesDatabaseContext, ArticlesDatabaseSqlServerContext>(options =>
+                    {
+                        options.UseSqlServer(Configuration["ConnectionString"],
+                            sqlServerOptionsAction: sqlOptions =>
+                            {
+                                sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
+                                //Configuring Connection Resiliency: https://docs.microsoft.com/en-us/ef/core/miscellaneous/connection-resiliency 
+                                sqlOptions.EnableRetryOnFailure(maxRetryCount: 15, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
+                            });
+
+                        // Changing default behavior when client evaluation occurs to throw. 
+                        // Default in EF Core would be to log a warning when client evaluation is performed.
+                        // RelationalEventId.QueryPossibleUnintendedUseOfEqualsWarning == CoreEventId.RelationalBaseId + 500
+                        options.ConfigureWarnings(warnings => warnings.Throw(CoreEventId.RelationalBaseId + 500));
+                        //Check Client vs. Server evaluation: https://docs.microsoft.com/en-us/ef/core/querying/client-eval
+                    });
+            }
+            else
+            {
+                services.AddDbContext<IArticlesDatabaseContext, ArticlesDatabaseInMemoryDbContext>(ConfigureInMemoryDatabase);
+            }
             
             services.AddMediatR(typeof(Startup));
             

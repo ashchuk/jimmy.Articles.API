@@ -10,9 +10,9 @@ namespace jimmy.Articles.API.Domain.Articles.Queries
 {
     public class GetArticleByIdQueryHandler: IRequestHandler<GetArticleByIdQuery, Article>
     {
-        private readonly ArticlesDatabaseContext _context;
+        private readonly IArticlesDatabaseContext _context;
 
-        public GetArticleByIdQueryHandler(ArticlesDatabaseContext context)
+        public GetArticleByIdQueryHandler(IArticlesDatabaseContext context)
         {
             _context = context;
         }
