@@ -9,7 +9,6 @@ namespace jimmy.Articles.API.Validation
         {
             RuleFor(resource =>  resource.Limit).GreaterThan(1);
             RuleFor(resource =>  resource.Offset).GreaterThan(-1);
-            RuleFor(resource =>  resource.DescendingOrderFlag).NotEmpty();
         }
     }
 }

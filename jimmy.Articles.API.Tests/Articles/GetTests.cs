@@ -42,7 +42,7 @@ namespace jimmy.Articles.API.Tests.Articles
         public async Task Should_limit_query_for_articles()
         {
             const int limit = 10;
-            const int offset = 20;
+            const int offset = 0;
             const bool descending = false;
             foreach (var index in Enumerable.Range(1, 20))
             {
@@ -59,7 +59,7 @@ namespace jimmy.Articles.API.Tests.Articles
             var result = await _fixture.SendAsync(new GetArticlesQuery(limit, offset, descending));
             result.Count.ShouldBe(limit);
         }
-        
+
         [Fact]
         public async Task Should_be_sorted_by_ascending()
         {
@@ -84,8 +84,8 @@ namespace jimmy.Articles.API.Tests.Articles
             var firstDate = result.First().CreationDate;
             var lastDate = result.Last().CreationDate;
             firstDate.ShouldBeLessThan(lastDate);
-        }     
-        
+        }
+
         [Fact]
         public async Task Should_be_sorted_by_descending()
         {
@@ -110,28 +110,29 @@ namespace jimmy.Articles.API.Tests.Articles
             var firstDate = result.First().CreationDate;
             var lastDate = result.Last().CreationDate;
             firstDate.ShouldBeGreaterThan(lastDate);
-        }     
-        
+        }
+
         [Fact]
-        public async Task Should_return_empty_list_if_limit_is_invalid()
+        public async Task Should_skip_right_number_of_articles()
         {
-            const int limit = -1;
-            const int offset = 20;
-            const bool descending = true;
+            const int limit = 5;
+            const int offset = 5;
+            const bool descending = false;
             foreach (var index in Enumerable.Range(1, 20))
             {
                 await _fixture.InsertAsync(new Article
                 {
                     Id = Guid.NewGuid(),
-                    Title = $"New Article title {index}",
-                    Body = $"New Article body {index}",
+                    Title = $"{index}",
+                    Body = $"{index}",
                     CreationDate = DateTime.Now,
                     UpdatingDate = DateTime.Now
                 });
+                await Task.Delay(200);
             }
 
             var result = await _fixture.SendAsync(new GetArticlesQuery(limit, offset, descending));
-            result.Count().ShouldBe(0);
+            result.First().Title.ShouldBe((limit + 1).ToString());
         }
     }
 }

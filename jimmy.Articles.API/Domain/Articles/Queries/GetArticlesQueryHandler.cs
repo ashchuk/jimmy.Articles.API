@@ -21,14 +21,14 @@ namespace jimmy.Articles.API.Domain.Articles.Queries
 
         public async Task<List<Article>> Handle(GetArticlesQuery request, CancellationToken cancellationToken)
         {
-            if (request.Limit < 0)
-            {
-                // throw new ArgumentException("The limit parameter shout be greater than zero!");
+            if (request.Limit < -1)
+            {              
+                // throw new ArgumentException("The offset parameter shout be positive number!");
                 return new List<Article>();
             }
-            if (request.Offset < 0)
+            if (request.Offset < -1)
             {
-                // throw new ArgumentException("The offset parameter shout be greater than zero!");
+                // throw new ArgumentException("The offset parameter shout be positive number!");
                 return new List<Article>();
             }
 
@@ -36,6 +36,10 @@ namespace jimmy.Articles.API.Domain.Articles.Queries
             if (request.DescendingOrderFlag)
             {
                 articleQuery = articleQuery.OrderByDescending(item => item.CreationDate);
+            }
+            else
+            {
+                articleQuery = articleQuery.OrderBy(item => item.CreationDate);
             }
             articleQuery = articleQuery.Skip(request.Offset).Take(request.Limit);
 

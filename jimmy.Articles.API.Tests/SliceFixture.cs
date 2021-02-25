@@ -42,8 +42,7 @@ namespace jimmy.Articles.API.Tests
         public class ArticlesTestApplicationFactory
             : WebApplicationFactory<Startup>
         {
-            private string _connectionString = "Server=127.0.0.1,5433;Database=articlesdb;User Id=SA;Password=Pass@word;";
-            // private string _connectionString = "Server=sqldata-test,1433;Database=articlesdb;User Id=SA;Password=Pass@word";
+            private string _connectionString = Environment.GetEnvironmentVariable("ConnectionString");
 
             protected override void ConfigureWebHost(IWebHostBuilder builder)
             {
@@ -51,7 +50,7 @@ namespace jimmy.Articles.API.Tests
                 {
                     configBuilder.AddInMemoryCollection(new Dictionary<string, string>
                     {
-                        {"ConnectionStrings:DefaultConnection", _connectionString}
+                        {"ConnectionString", _connectionString}
                     });
                 });
             }
@@ -220,12 +219,12 @@ namespace jimmy.Articles.API.Tests
 
         public Task InitializeAsync()
         {
-            if (string.IsNullOrEmpty(_configuration.GetConnectionString("DefaultConnection")))
+            if (string.IsNullOrEmpty(_configuration.GetValue<string>("ConnectionString")))
             {
                 return Task.CompletedTask;
             }
 
-            return _checkpoint.Reset(_configuration.GetConnectionString("DefaultConnection"));
+            return _checkpoint.Reset(_configuration.GetValue<string>("ConnectionString"));
         }
 
         public Task DisposeAsync()

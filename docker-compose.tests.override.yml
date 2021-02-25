@@ -18,7 +18,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - ConnectionString=Server=sqldata-test,1433;Database=articlesdb;User Id=SA;Password=Pass@word;
+      - ConnectionString=${Server=sqldata-test;Database=ARTICLE_DB;User Id=sa;Password=Pass@word}
       - Database__DatabaseType=SQLServer
       - UserServiceUsername=${USER_SERVICE_USERNAME}
       - UserServicePassword=${USER_SERVICE_PASSWORD}
