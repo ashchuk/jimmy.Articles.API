@@ -21,6 +21,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - ConnectionString=${Server=sqldata;Database=ARTICLE_DB;User Id=sa;Password=Pass@word}
+      - Database__DatabaseType=${DATABASE_TYPE}
       - UserServiceUsername=${USER_SERVICE_USERNAME}
       - UserServicePassword=${USER_SERVICE_PASSWORD}
       - UseXmlFormatter=${USE_XML_FORMATTER}
@@ -28,7 +29,6 @@ services:
       - articles-network
     ports:
       - "5102:80"
-      - "9102:81"
 
 volumes:
   articles-sqldata:

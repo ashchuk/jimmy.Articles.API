@@ -11,7 +11,7 @@ namespace jimmy.Articles.API.Controllers
 {    
     [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     public class ArticlesController : Controller
     {
         private readonly IMediator _mediator;

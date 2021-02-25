@@ -9,7 +9,7 @@ namespace jimmy.Articles.API.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     public class UsersController : ControllerBase
     {
         private readonly IMediator _mediator;
