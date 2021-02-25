@@ -7,10 +7,8 @@ namespace jimmy.Articles.API.Validation
     {
         public GetArticlesQueryValidator()
         {
-            RuleFor(resource =>  resource.Limit).GreaterThan(0);
-            RuleFor(resource =>  resource.Offset).GreaterThan(0);
-            RuleFor(resource =>  resource.Limit).NotEmpty();
-            RuleFor(resource =>  resource.Offset).NotEmpty();
+            RuleFor(resource =>  resource.Limit).GreaterThan(1);
+            RuleFor(resource =>  resource.Offset).GreaterThan(-1);
             RuleFor(resource =>  resource.DescendingOrderFlag).NotEmpty();
         }
     }

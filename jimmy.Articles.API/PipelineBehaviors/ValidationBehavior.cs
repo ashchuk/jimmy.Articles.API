@@ -9,7 +9,6 @@ namespace jimmy.Articles.API.PipelineBehaviors
 {
     public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IRequest<TResponse> 
-        // where TResponse : ValidationResult, new()
     {
         private readonly IEnumerable<IValidator<TRequest>> _validators;
 
@@ -24,12 +23,15 @@ namespace jimmy.Articles.API.PipelineBehaviors
             
             var context = new ValidationContext<TRequest>(request);
 
-            var validationResults = await Task.WhenAll(_validators.Select(v => v.ValidateAsync(context, cancellationToken)));
-            var failures = validationResults.SelectMany(r => r.Errors).Where(f => f != null).ToList();
+            var validationResults = await Task
+                .WhenAll(_validators.Select(v => v.ValidateAsync(context, cancellationToken)));
+            
+            var failures = validationResults
+                .SelectMany(r => r.Errors).Where(f => f != null).ToList();
 
             if (failures.Any())
-                // return Task.FromResult<List<ValidationResult>>();
                 throw new FluentValidation.ValidationException(failures);
+            
             return await next();
         }
     }
