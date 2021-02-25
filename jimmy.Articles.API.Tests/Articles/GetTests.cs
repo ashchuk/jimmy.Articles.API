@@ -118,6 +118,7 @@ namespace jimmy.Articles.API.Tests.Articles
             const int limit = 5;
             const int offset = 5;
             const bool descending = false;
+            await _fixture.InitializeAsync();
             foreach (var index in Enumerable.Range(1, 20))
             {
                 await _fixture.InsertAsync(new Article
