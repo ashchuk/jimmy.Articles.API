@@ -10,6 +10,12 @@ The application written using MediatR, it's a .Net mediator pattern implementati
 
 Project folders contains it's own README files, you can check it to get more details about some project parts.
 
+- [Controllers](https://github.com/ashchuk/jimmy.Articles.API/tree/master/jimmy.Articles.API/Controllers)
+- [Domain](https://github.com/ashchuk/jimmy.Articles.API/tree/master/jimmy.Articles.API/Domain)
+- [Infrastructure](https://github.com/ashchuk/jimmy.Articles.API/tree/master/jimmy.Articles.API/Infrastructure)
+- [Validation and logging pipelines](https://github.com/ashchuk/jimmy.Articles.API/tree/master/jimmy.Articles.API/PipelineBehaviors)
+- [Validation models](https://github.com/ashchuk/jimmy.Articles.API/tree/master/jimmy.Articles.API/Validation)
+
 ## Run the app
 
 ```docker-compose -f .\docker-compose.yml -f .\docker-compose.override.yml up sqldata articles-api```
@@ -42,7 +48,7 @@ After run you can use SwaggerUI which accessible at ```http://localhost:5102/swa
 - Article updating date and time
 
 ✅ Creating/updating/deleting data is possible only if a secret token is provided.
-- Basic auth implemented, just provide username and password to use POST/PUT/UPDATE methods. GET methods are accessible withoud auth.
+- App has basic auth implementation, just provide username and password to use POST/PUT/UPDATE methods. GET methods are accessible without auth.
 - Default user/password can be set USER_SERVICE_USERNAME and USER_SERVICE_PASSWORD env variables in .env configuration file.
 - By default USER_SERVICE_USERNAME set to 'test' and USER_SERVICE_PASSWORD set to 'test'.
 - If USER_SERVICE_USERNAME and USER_SERVICE_PASSWORD are not provided, the username set to 'test ' and password set to 'test'

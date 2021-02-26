@@ -5,5 +5,11 @@ This folder contains MediatR PipelineBehavior implementations, which allow to bu
 It's a more natural way to enhance your handlers with behavior and better supported in containers.
 
 So, there are two pipelines here:
-- ValidationBehavior - it's a pipeline that check command`s fields and validate them in FluentValidation manner.
-- LoggingBehavior - it's a pipeline that collects data the data that went through CommandHandlers and QueryHandlers. Also it collects the data that comes from users and send it to console.
+- ```ValidationBehavior.cs``` - it's a pipeline that check command`s fields and validate them in ```FluentValidation``` manner.
+- ```LoggingBehavior.cs``` - it's a pipeline that collects data the data that went through CommandHandlers and QueryHandlers. Also it collects the data that comes from users and send it to console.
+
+###Note:
+ValidationBehavior throws ```new ValidationException()``` when one of the validators fails. 
+
+There is a workaround in ```Startup.cs``` to transform this exceptions from 500 status code errors to 400 status code message with user-friendly response type.
+See details in [ValidationExceptionsPreprocessing](https://github.com/ashchuk/jimmy.Articles.API/blob/master/jimmy.Articles.API/Startup.cs#L164) region in ```Startup.cs```
