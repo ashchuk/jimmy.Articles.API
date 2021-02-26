@@ -1,6 +1,6 @@
 ## Tests
 
-```SliceFixture``` class contains ```WebApplicationFactory``` initialization and some additional methods which allows to make some database preparation for tests like insert some test data or reset database state to default.
+```SliceFixture``` class contains ```WebApplicationFactory``` initialization and some additional methods which allow making some database preparation for tests like insert some test data or reset database state to default.
 
 Use ```InitializeAsync()``` to reset database.
 
