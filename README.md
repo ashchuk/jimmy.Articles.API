@@ -1,12 +1,10 @@
 # Articles REST API application
 
-This is a simple Articles CMS example of a .Net Core application written in a CQRS manner.
+This is a simple "Articles CMS" example of a .Net Core application written in a CQRS manner.
 
 It provides a REST API to an EntityFramework-backed article model.
 
 The application uses [MediatR](https://github.com/jbogard/MediatR), it's a .Net mediator pattern implementation by Jimmy Bogard.
-
-`.env` is a docker-compose environment configuration for the application.
 
 ## About repo and app structure
 
@@ -26,9 +24,11 @@ By default API available at ```http://localhost:5102/```
 
 After run you can use SwaggerUI which accessible at ```http://localhost:5102/swagger/index.html``` to make some test queries.
 
-To access POST/PUT/UPDATE methods you need to authorize in the application. You can use the sample below with default user credentials:
+❗️ To access POST/PUT/UPDATE methods you need to authorize in the application. You can use the command below with default user credentials:
 
 ```curl -X POST "http://localhost:5102/api/v1/Users/authenticate" -H  "accept: */*" -H  "Content-Type: application/json" -d "{\"username\":\"test\",\"password\":\"test\"}"```
+
+Edit the [`.env`](https://github.com/ashchuk/jimmy.Articles.API/blob/master/.env) to change default app configuration.
 
 ## Run the tests
 
