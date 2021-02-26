@@ -8,7 +8,7 @@ So, there are two pipelines here:
 - ```ValidationBehavior.cs``` - it's a pipeline that checks command`s fields and validates them in ```FluentValidation``` manner.
 - ```LoggingBehavior.cs``` - it's a pipeline that collects data that went through CommandHandlers and QueryHandlers. Also, it collects the data that comes from users and sends it to the console.
 
-###Note:
+### Note:
 
 ValidationBehavior throws ```new ValidationException()``` when one of the validators fails.
 
