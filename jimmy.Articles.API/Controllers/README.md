@@ -153,7 +153,7 @@ The REST API to the app is described below.
 
 `POST /api/v1/Users/authenticate`
 
-    /api/v1/Users/authenticate
+    curl -X POST "http://localhost:5102/api/v1/Users/authenticate" -H  "accept: */*" -H  "Content-Type: application/json" -d "{\"username\":\"test\",\"password\":\"test\"}"
 
 ### Request parameters
 

@@ -25,6 +25,16 @@ services:
       - UserServiceUsername=${USER_SERVICE_USERNAME}
       - UserServicePassword=${USER_SERVICE_PASSWORD}
       - UseXmlFormatter=${USE_XML_FORMATTER}
+    depends_on:
+      - sqldata
+    entrypoint: 
+      - /wait-for-mssql.sh
+      - sqldata:1433
+      - -t
+      - "120"
+      - --
+      - dotnet
+      - jimmy.Articles.API.dll
     networks:
       - articles-network
     ports:

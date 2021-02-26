@@ -26,6 +26,10 @@ By default API available at ```http://localhost:5102/```
 
 After run you can use SwaggerUI which accessible at ```http://localhost:5102/swagger/index.html``` to make some test queries.
 
+To access POST/PUT/UPDATE methods you need to authorize in the application. You can use the sample below with default user credentials:
+
+```curl -X POST "http://localhost:5102/api/v1/Users/authenticate" -H  "accept: */*" -H  "Content-Type: application/json" -d "{\"username\":\"test\",\"password\":\"test\"}"```
+
 ## Run the tests
 
 ```docker-compose -f .\docker-compose.tests.yml -f .\docker-compose.tests.override.yml up sqldata-test articles-api-test```

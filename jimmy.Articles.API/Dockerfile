@@ -32,6 +32,11 @@ WORKDIR /jimmy.Articles.API.Tests
 FROM build AS publish
 
 FROM base AS final
-WORKDIR /app
+
+# MSSQL connection healthcheck script
+COPY wait-for-mssql.sh /wait-for-mssql.sh
+RUN chmod +x /wait-for-mssql.sh
+
+WORKDIR /app    
 COPY --from=publish /app .
 ENTRYPOINT ["dotnet", "jimmy.Articles.API.dll"]
